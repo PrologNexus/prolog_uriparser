@@ -2,7 +2,6 @@
 #include <SWI-cpp.h>
 #include <uriparser/Uri.h>
 
-#include <cpptest.h>
 #include <iostream>
 #include <memory>
 #include <stdio.h>

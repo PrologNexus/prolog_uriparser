@@ -5,7 +5,7 @@
 ** Install library ~uriparser~
 *** On Debian-based distro's (e.g., Ubuntu)
 #+BEGIN_SRC sh
-$ sudo apt install uriparser-dev
+$ sudo apt install liburiparser-dev
 #+END_SRC
 *** On Red Hat-based distro's (e.g., Fedora)
 #+BEGIN_SRC sh

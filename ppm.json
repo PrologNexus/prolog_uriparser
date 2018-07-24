@@ -1,0 +1,6 @@
+{
+  "dependencies": [
+    {"user": "wouterbeek", "repo": "uriparser"}
+  ],
+  "keywords": ["Universal Resource Identifier","URI"]
+}

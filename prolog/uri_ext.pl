@@ -29,6 +29,9 @@
 :- use_module(library(plunit)).
 :- use_module(library(yall)).
 
+:- use_module(library(dict)).
+:- use_module(library(file_ext)).
+
 :- use_foreign_library(foreign(uri_ext)).
 
 
@@ -182,7 +185,7 @@ uri_comps(Uri, uri(Scheme,Authority0,Segments,QueryComponents,Fragment)) :-
   ;   is_list(QueryComponents)
   ->  uri_query_components(Query, QueryComponents)
   ;   is_dict(QueryComponents)
-  ->  dict_pairs(QueryComponents, _, QueryPairs),
+  ->  dict_pairs(QueryComponents, QueryPairs),
       uri_query_components(Query, QueryPairs)
   ;   atomic(QueryComponents)
   ->  Query = QueryComponents

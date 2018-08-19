@@ -1,13 +1,18 @@
 :- module(
   uri_ext,
   [
-    check_iri/1,   % +Iri
-    check_uri/1,   % +Uri
-    is_http_uri/1, % @Term
-    is_iri/1,      % @Term
-    is_uri/1,      % @Term
-    resolve_uri/3, % +Base, +Relative, ?Absolute
-    uri_scheme/1   % ?Scheme
+    append_segments/3,     % +Segments1, +Segments2, ?Segments3
+    check_iri/1,           % +Iri
+    check_uri/1,           % +Uri
+    is_http_uri/1,         % @Term
+    is_iri/1,              % @Term
+    is_uri/1,              % @Term
+    resolve_uri/3,         % +Base, +Relative, ?Absolute
+    uri_comps/2,           % ?Uri, ?Components
+    uri_file_extensions/2, % +Uri, -Extensions
+    uri_file_local/2,      % +Uri, -Local
+    uri_media_type/2,      % +Uri, -MediaType
+    uri_scheme/1           % ?Scheme
   ]
 ).
 :- reexport(library(uri)).
@@ -18,11 +23,40 @@
 @versioin 2018
 */
 
+:- use_module(library(apply)).
 :- use_module(library(error)).
+:- use_module(library(lists)).
+:- use_module(library(plunit)).
+:- use_module(library(yall)).
 
 :- use_foreign_library(foreign(uri_ext)).
 
 
+
+
+
+%! append_segments(+Segments1:list(atom), +Segments2:list(atom), +Segments3:list(atom)) is semidet.
+%! append_segments(+Segments1:list(atom), +Segments2:list(atom), -Segments3:list(atom)) is det.
+%
+% Appends lists of path segments.  Empty segments commonly appear at
+% the beginning and end of URI paths.
+
+append_segments(L1a, L2a, L3) :-
+  exclude([X]>>(X==''), L1a, L1b),
+  exclude([X]>>(X==''), L2a, L2b),
+  append(L1b, L2b, L3).
+
+:- begin_tests(append_segments).
+
+test('append_segments(+,+,+)', [forall(test_append_segments(L1,L2,L3))]) :-
+  append_segments(L1, L2, L3).
+test('append_segments(+,+,+)', [forall(test_append_segments(L1,L2,L3))]) :-
+  append_segments(L1, L2, L3_),
+  assertion(L3_ == L3).
+
+test_append_segments(['',a,b,c,''], [''], [a,b,c]).
+
+:- end_tests(append_segments).
 
 
 
@@ -59,7 +93,7 @@ scheme_specific_checks(_, Scheme, Auth, Path) :-
       memberchk(Scheme, [file,mailto,urn])
   ->  ground(Path)
   ;   true
-  ).
+  ), !.
 scheme_specific_checks(Uri, _, _, _) :-
   syntax_error(grammar(uri,Uri)).
 
@@ -98,6 +132,103 @@ is_uri(Term) :-
 
 resolve_uri(Base, Relative, Absolute) :-
   resolve_uri_(Base, Relative, Absolute).
+
+
+
+%! uri_comps(+Uri, -Components) is det.
+%! uri_comps(-Uri, +Components) is det.
+%
+% Components is a compound term of the form
+% `uri(Scheme,Authority,Segments,Query,Fragment)', where:
+%
+%   * Authority is either an atom or a compound term of the form
+%     `auth(User,Password,Host,Port)'.
+%
+%   * Segments is a list of atomic path segments.
+%
+%   * Query is (1) a list of unary compound terms, or (2) a list of
+%     pairs, or (3) a flat dict (i.e., a dict with non-dict values).
+
+uri_comps(Uri, uri(Scheme,AuthorityComp,Segments,QueryComponents,Fragment)) :-
+  ground(Uri), !,
+  uri_components(Uri, uri_components(Scheme,Authority,Path,Query,Fragment)),
+  (   atom(Authority),
+      var(AuthorityComp)
+  ->  AuthorityComp = Authority
+  ;   auth_comps_(Scheme, Authority, AuthorityComp)
+  ),
+  atomic_list_concat([''|Segments], /, Path),
+  (   var(Query)
+  ->  QueryComponents = []
+  ;   % @hack Currently needed because buggy URI query components are
+      %       common.
+      catch(uri_query_components(Query, QueryComponents0), _, fail)
+  ->  list_to_set(QueryComponents0, QueryComponents)
+  ;   QueryComponents = []
+  ).
+uri_comps(Uri, uri(Scheme,Authority0,Segments,QueryComponents,Fragment)) :-
+  (   atom(Authority0)
+  ->  Authority = Authority0
+  ;   auth_comps_(Scheme, Authority, Authority0)
+  ),
+  (   var(Segments)
+  ->  true
+  ;   Segments == ['']
+  ->  Path = '/'
+  ;   atomic_list_concat([''|Segments], /, Path)
+  ),
+  (   var(QueryComponents)
+  ->  true
+  ;   is_list(QueryComponents)
+  ->  uri_query_components(Query, QueryComponents)
+  ;   is_dict(QueryComponents)
+  ->  dict_pairs(QueryComponents, _, QueryPairs),
+      uri_query_components(Query, QueryPairs)
+  ;   atomic(QueryComponents)
+  ->  Query = QueryComponents
+  ;   type_error(uri_query_components, QueryComponents)
+  ),
+  uri_components(Uri, uri_components(Scheme,Authority,Path,Query,Fragment)).
+
+auth_comps_(_, Authority, auth(User,Password,Host,Port)) :-
+  ground(Authority), !,
+  uri_authority_components(Authority, uri_authority(User,Password,Host,Port)).
+auth_comps_(Scheme, Authority, auth(User,Password,Host,Port0)) :-
+  (   var(Port0)
+  ->  true
+  ;   % Leave out the port if it is the default port for the given
+      % Scheme.
+      ground(Scheme),
+      uri:default_port(Scheme, Port0)
+  ->  true
+  ;   Port = Port0
+  ),
+  % Create the Authorityority string.
+  uri_authority_components(Authority, uri_authority(User,Password,Host,Port)).
+
+
+
+%! uri_file_extensions(+Uri:atom, -Extensions:list(atom)) is det.
+
+uri_file_extensions(Uri, Extensions) :-
+  uri_file_local(Uri, Local),
+  file_extensions(Local, Extensions).
+
+
+
+%! uri_file_local(+Uri:atom, -Local:atom) is det.
+
+uri_file_local(Uri, Local) :-
+  uri_comps(Uri, uri(_,_,Segments,_,_)),
+  last(Segments, Local).
+
+
+
+%! uri_media_type(+Uri:atom, -MediaType:compound) is det.
+
+uri_media_type(Uri, MediaType) :-
+  uri_file_extensions(Uri, Extensions),
+  file_extensions_media_type(Extensions, MediaType).
 
 
 

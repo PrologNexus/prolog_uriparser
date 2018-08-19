@@ -13,13 +13,13 @@
 
 extern "C" {
   static functor_t FUNCTOR_error2;
+  static functor_t FUNCTOR_relative_uri1;
   static functor_t FUNCTOR_uri_error2;
   static functor_t FUNCTOR_uri_error3;
-
 #define MKFUNCTOR(n,a) FUNCTOR_ ## n ## a = PL_new_functor(PL_new_atom(#n), a)
-
   install_t install_uri_ext(void) {
     MKFUNCTOR(error, 2);
+    MKFUNCTOR(relative_uri, 1);
     MKFUNCTOR(uri_error, 2);
     MKFUNCTOR(uri_error, 3);
   }
@@ -35,13 +35,20 @@ PREDICATE(is_uri_, 1) {
   UriParserStateA state;
   UriUriA uri;
   state.uri = &uri;
-  bool ok {(uriParseUriA(&state, s) == URI_SUCCESS)};
+  bool ok {uriParseUriA(&state, s) == URI_SUCCESS};
+  bool abs {uri.scheme.first};
   uriFreeUriMembersA(&uri);
-  if (ok) {
-    PL_succeed;
+  if (ok && abs) {
+      PL_succeed;
   }
   term_t err {PL_new_term_ref()};
-  if (state.errorCode == URI_ERROR_SYNTAX) {
+  if (ok) {
+    PL_unify_term(err,
+                  PL_FUNCTOR, FUNCTOR_error2,
+                  PL_FUNCTOR, FUNCTOR_relative_uri1,
+                  PL_CHARS, s,
+                  PL_VARIABLE);
+  } else if (state.errorCode == URI_ERROR_SYNTAX) {
     PL_unify_term(err,
                   PL_FUNCTOR, FUNCTOR_error2,
                   PL_FUNCTOR, FUNCTOR_uri_error3,
@@ -59,27 +66,6 @@ PREDICATE(is_uri_, 1) {
   }
   return PL_raise_exception(err);
 }
-
-/*
-// is_xsd_string_(@Term) is semidet.
-PREDICATE(is_xsd_string_, 1)
-{
-  char* lex;
-  size_t len;
-  if (!PL_get_nchars(A1, &len, &lex, CVT_TEXT)) {
-    PL_fail;
-  }
-  for (size_t i {0}; i < len; i++) {
-    if (0x1 < lex[i] ||
-        (0xD7FF < lex[i] && lex[i] < 0xE000) ||
-        (0xFFFD < lex[i] && lex[i] < 0x10000) ||
-        0x10FFFF < lex[i]) {
-      PL_fail;
-    }
-  }
-  PL_succeed;
-}
-*/
 
 // resolve_uri_(+Base:atom, +Rel:atom, -Abs:atom) is det.
 PREDICATE(resolve_uri_, 3) {

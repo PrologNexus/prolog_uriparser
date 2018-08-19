@@ -1,5 +1,8 @@
-#+TITLE: uriparser wrapper for SWI-Prolog
+#+TITLE: uri_ext: Extended URI/IRI support for SWI-Prolog
 #+AUTHOR: Wouter Beek
+
+Extends the standard library ~uri~ with predicates that use the
+C-based ~uriparser~.
 
 * Installation
 ** Install library ~uriparser~
@@ -10,9 +13,4 @@ $ sudo apt install liburiparser-dev
 *** On Red Hat-based distro's (e.g., Fedora)
 #+BEGIN_SRC sh
 $ sudo dnf install uriparser-devel
-#+END_SRC
-** Install Prolog Pack
-#+BEGIN_SRC sh
-$ swipl
-?- pack_install(uriparser).
 #+END_SRC

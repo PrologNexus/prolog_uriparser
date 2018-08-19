@@ -5,7 +5,7 @@ ld=g++
 libs=-luriparser
 obj=$(src:.cpp=.o)
 rm=rm -f
-sobj=$(PACKSODIR)/uriparser.$(SOEXT)
+sobj=$(PACKSODIR)/uri_ext.$(SOEXT)
 src=$(wildcard cpp/*.cpp)
 
 all:	$(sobj)

@@ -39,32 +39,35 @@ PREDICATE(is_uri_, 1) {
   bool abs {uri.scheme.first};
   uriFreeUriMembersA(&uri);
   if (ok && abs) {
-      PL_succeed;
+    PL_succeed;
   }
   term_t err {PL_new_term_ref()};
-  if (ok) {
-    PL_unify_term(err,
-                  PL_FUNCTOR, FUNCTOR_error2,
-                  PL_FUNCTOR, FUNCTOR_relative_uri1,
-                  PL_CHARS, s,
-                  PL_VARIABLE);
-  } else if (state.errorCode == URI_ERROR_SYNTAX) {
-    PL_unify_term(err,
-                  PL_FUNCTOR, FUNCTOR_error2,
-                  PL_FUNCTOR, FUNCTOR_uri_error3,
-                  PL_INT, state.errorCode,
-                  PL_CHARS, s,
-                  PL_LONG, (long)(state.errorPos-s),
-                  PL_VARIABLE);
-  } else {
-    PL_unify_term(err,
-                  PL_FUNCTOR, FUNCTOR_error2,
-                  PL_FUNCTOR, FUNCTOR_uri_error2,
-                  PL_INT, state.errorCode,
-                  PL_CHARS, s,
-                  PL_VARIABLE);
+  int errOk;
+  if (err) {
+    if (ok) {
+      errOk = PL_unify_term(err,
+                            PL_FUNCTOR, FUNCTOR_error2,
+                            PL_FUNCTOR, FUNCTOR_relative_uri1,
+                            PL_CHARS, s,
+                            PL_VARIABLE);
+    } else if (state.errorCode == URI_ERROR_SYNTAX) {
+      errOk = PL_unify_term(err,
+                            PL_FUNCTOR, FUNCTOR_error2,
+                            PL_FUNCTOR, FUNCTOR_uri_error3,
+                            PL_INT, state.errorCode,
+                            PL_CHARS, s,
+                            PL_LONG, (long)(state.errorPos-s),
+                            PL_VARIABLE);
+    } else {
+      errOk = PL_unify_term(err,
+                            PL_FUNCTOR, FUNCTOR_error2,
+                            PL_FUNCTOR, FUNCTOR_uri_error2,
+                            PL_INT, state.errorCode,
+                            PL_CHARS, s,
+                            PL_VARIABLE);
+    }
   }
-  return PL_raise_exception(err);
+  return err && errOk && PL_raise_exception(err);
 }
 
 // resolve_uri_(+Base:atom, +Rel:atom, -Abs:atom) is det.

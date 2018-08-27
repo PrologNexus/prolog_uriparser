@@ -31,6 +31,7 @@
 
 :- use_module(library(dict)).
 :- use_module(library(file_ext)).
+:- use_module(library(http/http_generic)).
 
 :- use_foreign_library(foreign(uri_ext)).
 

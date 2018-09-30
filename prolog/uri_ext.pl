@@ -8,6 +8,7 @@
     is_iri/1,              % @Term
     is_uri/1,              % @Term
     resolve_uri/3,         % +Base, +Relative, ?Absolute
+    uri_comp_set/4,        % +Kind, +Uri1, +Component, -Uri2
     uri_comps/2,           % ?Uri, ?Components
     uri_file_extensions/2, % +Uri, -Extensions
     uri_file_local/2,      % +Uri, -Local
@@ -136,6 +137,20 @@ is_uri(Term) :-
 
 resolve_uri(Base, Relative, Absolute) :-
   resolve_uri_(Base, Relative, Absolute).
+
+
+
+%! uri_comp_set(+Kind:oneof([fragment,query]), +Uri1, +Component, -Uri2) is det.
+%
+% Change a specific URI component.
+
+uri_comp_set(fragment, Uri1, Fragment, Uri2) :-
+  uri_components(Uri1, uri_components(Scheme,Authority,Path,Query,_)),
+  uri_components(Uri2, uri_components(Scheme,Authority,Path,Query,Fragment)).
+uri_comp_set(query, Uri1, QueryComponents, Uri2) :-
+  uri_components(Uri1, uri_components(Scheme,Authority,Path,_,Fragment)),
+  uri_query_components(Query, QueryComponents),
+  uri_components(Uri2, uri_components(Scheme,Authority,Path,Query,Fragment)).
 
 
 

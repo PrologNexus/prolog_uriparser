@@ -13,7 +13,8 @@
     uri_file_extensions/2, % +Uri, -Extensions
     uri_file_local/2,      % +Uri, -Local
     uri_media_type/2,      % +Uri, -MediaType
-    uri_scheme/1           % ?Scheme
+    uri_scheme/1,          % ?Scheme
+    uri_strip/2            % +Uri, -Base
   ]
 ).
 :- reexport(library(uri)).
@@ -537,3 +538,13 @@ uri_scheme(ymsgr).
 uri_scheme('z39.50').
 uri_scheme('z39.50r').
 uri_scheme('z39.50s').
+
+
+
+%! uri_strip(+Uri1:atom, -Uri2:atom) is det.
+%
+% Uri2 is like Uri1, but without the query and fragment components.
+
+uri_strip(Uri1, Uri2) :-
+  uri_comps(Uri1, uri(Scheme,Auth,Segments,_,_)),
+  uri_comps(Uri2, uri(Scheme,Auth,Segments,_,_)).

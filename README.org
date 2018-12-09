@@ -1,4 +1,4 @@
-#+TITLE: prolog_uriparser: URI parsing support for SWI-Prolog
+#+TITLE: ~prolog_uriparser~: URI parsing support for SWI-Prolog
 #+AUTHOR: Wouter Beek
 
 Extends the standard library ~uri~ with predicates that use the

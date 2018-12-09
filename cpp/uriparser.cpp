@@ -27,7 +27,7 @@ extern "C" {
 
 // is_uri_(@Term) is semidet.
 PREDICATE(is_uri_, 1) {
-  char *s;
+  char* s;
   size_t len;
   if (!PL_get_nchars(A1, &len, &s, CVT_TEXT)) {
     PL_fail;

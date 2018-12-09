@@ -1,26 +1,26 @@
 # -*- Makefile
 
-CFLAGS+=-c -g -std=c++17 -Wall -Wextra
-ld=g++
-libs=-luriparser
-obj=$(src:.cpp=.o)
-rm=rm -f
-sobj=$(PACKSODIR)/uri_ext.$(SOEXT)
-src=$(wildcard cpp/*.cpp)
+CXXFLAGS+=-g -std=c++17 -Wall -Wextra
+LD=g++
+LIB=-luriparser
+OBJ=$(SRC:.cpp=.o)
+SOBJ=$(PACKSODIR)/uriparser.$(SOEXT)
+SRC=$(wildcard cpp/*.cpp)
 
-all:	$(sobj)
+.PHONY: check clean distclean install
 
-$(sobj): $(obj)
+all:	$(SOBJ)
+
+$(SOBJ): $(OBJ)
 	mkdir -p $(PACKSODIR)
-	$(ld) $(ARCH) $(LDSOFLAGS) -o $@ $^ $(libs) $(SWISOLIB)
+	$(LD) $(ARCH) $(LDSOFLAGS) -o $@ $^ $(LIBS) $(SWISOLIB)
 
 cpp/%.o: cpp/%.cpp
-	$(CC) $(ARCH) $(CFLAGS) -o $@ $<
+	$(CXX) $(ARCH) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+distclean:
+	$(RM) $(SOBJ) $(OBJ)
 
 check::
 install::
-clean:
-	$(rm) $(sobj) $(obj)
-
-distclean:
-	$(rm) $(sobj) $(obj)

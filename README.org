@@ -1,16 +1,27 @@
-#+TITLE: uri_ext: Extended URI/IRI support for SWI-Prolog
+#+TITLE: prolog_uriparser: URI parsing support for SWI-Prolog
 #+AUTHOR: Wouter Beek
 
 Extends the standard library ~uri~ with predicates that use the
-C-based ~uriparser~.
+C-based ~uriparser~ for parsing URIs.
 
 * Installation
-** Install library ~uriparser~
-*** On Debian-based distro's (e.g., Ubuntu)
+
+  1. Install [[http://www.swi-prolog.org][SWI-Prolog]].
+  2. Install [[https://github.com/wouterbeek.com/Prolog-Library-Collection][Prolog-Library-Collection]].
+  3. Install ~uriparser~ library:
+
+    - ~sudo apt install liburiparser-dev~ on Debian-based distro's (e.g., Ubuntu).
+    - ~sudo dnf install uriparser-devel~ on Red Hat-based distro's (e.g., Fedora).
+
+  4. Clone this library: ~git clone https://github.com/wouterbeek/prolog_uriparser~
+  5. Compile the C++ sources:
+
 #+BEGIN_SRC sh
-$ sudo apt install liburiparser-dev
+$ swipl -s make.pl -g make -t halt
 #+END_SRC
-*** On Red Hat-based distro's (e.g., Fedora)
-#+BEGIN_SRC sh
-$ sudo dnf install uriparser-devel
+
+  6. Add the following line to your ~.swiplrc~ file:
+
+#+BEGIN_SRC prolog
+user:file_search_path(library, '/your/path/to/prolog_uriparser/prolog').
 #+END_SRC

@@ -10,18 +10,21 @@ C-based ~uriparser~ for parsing URIs.
   2. Install [[https://github.com/wouterbeek.com/Prolog-Library-Collection][Prolog-Library-Collection]].
   3. Install ~uriparser~ library:
 
-    - ~sudo apt install liburiparser-dev~ on Debian-based distro's (e.g., Ubuntu).
-    - ~sudo dnf install uriparser-devel~ on Red Hat-based distro's (e.g., Fedora).
+     - ~sudo apt install liburiparser-dev~ on Debian-based distro's
+       (e.g., Ubuntu).
+
+     - ~sudo dnf install uriparser-devel~ on Red Hat-based distro's
+       (e.g., Fedora).
 
   4. Clone this library: ~git clone https://github.com/wouterbeek/prolog_uriparser~
   5. Compile the C++ sources:
 
-#+BEGIN_SRC sh
-$ swipl -s make.pl -g make -t halt
-#+END_SRC
+  #+BEGIN_SRC sh
+  $ swipl -s make.pl -g make -t halt
+  #+END_SRC
 
   6. Add the following line to your ~.swiplrc~ file:
 
-#+BEGIN_SRC prolog
-user:file_search_path(library, '/your/path/to/prolog_uriparser/prolog').
-#+END_SRC
+  #+BEGIN_SRC prolog
+  user:file_search_path(library, '/your/path/to/prolog_uriparser/prolog').
+  #+END_SRC

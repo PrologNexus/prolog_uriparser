@@ -13,7 +13,7 @@ all:	$(SOBJ)
 
 $(SOBJ): $(OBJ)
 	mkdir -p $(PACKSODIR)
-	$(LD) $(ARCH) $(LDSOFLAGS) -o $@ $^ $(LIBS) $(SWISOLIB)
+	$(LD) $(ARCH) $(LDSOFLAGS) -o $@ $^ $(LIB) $(SWISOLIB)
 
 cpp/%.o: cpp/%.cpp
 	$(CXX) $(ARCH) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<

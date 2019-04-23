@@ -14,10 +14,8 @@
 /** <module> URI parsing
 
 @author Wouter Beek
-@versioin 2018
+@versioin 2018-2019
 */
-
-:- use_module(library(error)).
 
 :- use_module(library(uri_ext)).
 
@@ -43,14 +41,14 @@ check_iri(Iri) :-
 
 check_uri(Uri) :-
   uri_components(Uri, uri_components(Scheme,Auth,Path,_,_)),
-  check_scheme(Scheme),
+  check_scheme_(Scheme, Uri),
   scheme_specific_checks(Uri, Scheme, Auth, Path),
   is_uri_(Uri).
 
-check_scheme(Scheme) :-
+check_scheme_(Scheme, _) :-
   uri_scheme(Scheme), !.
-check_scheme(Scheme) :-
-  existence_error(uri_scheme, Scheme).
+check_scheme_(_Scheme, Uri) :-
+  throw(error(existence_error(uri_scheme,Schema),Uri)).
 
 scheme_specific_checks(_, Scheme, Auth, Path) :-
   (   % URI schemes that require a ground authority component.

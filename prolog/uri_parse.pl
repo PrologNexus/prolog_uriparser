@@ -47,7 +47,7 @@ check_uri(Uri) :-
 
 check_scheme_(Scheme, _) :-
   uri_scheme(Scheme), !.
-check_scheme_(Scheme, Uri) :-
+check_scheme_(Schema, Uri) :-
   throw(error(existence_error(uri_scheme,Schema),Uri)).
 
 scheme_specific_checks(_, Scheme, Auth, Path) :-

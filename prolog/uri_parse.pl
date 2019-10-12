@@ -26,6 +26,10 @@
 
 
 %! check_iri(+Iri:atom) is semidet.
+%
+% Succeeds iff `Iri' is an absolute IRI.
+%
+% TODO: Only checking for URI compliance ATM.
 
 check_iri(Iri) :-
   uri_iri(Uri, Iri),
@@ -35,9 +39,9 @@ check_iri(Iri) :-
 
 %! check_uri(+Uri:atom) is semidet.
 %
-% @throws existence_error(uri_scheme,Scheme:atom)
+% Succeeds iff `Uri' is an absolute URI.
 %
-% @throws syntax_error(grammar(uri,Uri:atom))
+% @throws existence_error(uri_scheme,Scheme:atom)
 
 check_uri(Uri) :-
   uri_components(Uri, uri_components(Scheme,Auth,Path,_,_)),

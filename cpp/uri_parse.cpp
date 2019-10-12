@@ -1,13 +1,14 @@
+#include <cstdio>
 #include <cstdlib>
+#include <cwchar>
 #include <iostream>
 #include <memory>
-#include <stdio.h>
+
 #include <SWI-Prolog.h>
 #include <SWI-Stream.h>
 #include <SWI-cpp.h>
 #include <uriparser/Uri.h>
 #include <uriparser/UriBase.h>
-#include <wchar.h>
 
 #define CVT_TEXT (CVT_ATOM|CVT_STRING|CVT_EXCEPTION|REP_UTF8)
 
@@ -17,7 +18,8 @@ extern "C" {
   static functor_t FUNCTOR_uri_error2;
   static functor_t FUNCTOR_uri_error3;
 #define MKFUNCTOR(n,a) FUNCTOR_ ## n ## a = PL_new_functor(PL_new_atom(#n), a)
-  install_t install_uri_ext(void) {
+  auto install_uri_ext(void) -> install_t
+  {
     MKFUNCTOR(error, 2);
     MKFUNCTOR(relative_uri, 1);
     MKFUNCTOR(uri_error, 2);
@@ -26,57 +28,34 @@ extern "C" {
 }
 
 // is_uri_(@Term) is semidet.
-PREDICATE(is_uri_, 1) {
+PREDICATE(is_uri_, 1)
+{
   char* s;
-  size_t len;
-  if (!PL_get_nchars(A1, &len, &s, CVT_TEXT)) {
+  std::size_t length;
+  if (!PL_get_nchars(A1, &length, &s, CVT_TEXT)) {
     PL_fail;
   }
   UriParserStateA state;
   UriUriA uri;
   state.uri = &uri;
-  bool ok {uriParseUriA(&state, s) == URI_SUCCESS};
-  bool abs {uri.scheme.first};
+  const bool ok {uriParseUriA(&state, s) == URI_SUCCESS};
+  const bool absolute {uri.scheme.first};
   uriFreeUriMembersA(&uri);
-  if (ok && abs) {
+  if (ok && absolute) {
     PL_succeed;
+  } else {
+    PL_fail;
   }
-  term_t err {PL_new_term_ref()};
-  int errOk;
-  if (err) {
-    if (ok) {
-      errOk = PL_unify_term(err,
-                            PL_FUNCTOR, FUNCTOR_error2,
-                            PL_FUNCTOR, FUNCTOR_relative_uri1,
-                            PL_CHARS, s,
-                            PL_VARIABLE);
-    } else if (state.errorCode == URI_ERROR_SYNTAX) {
-      errOk = PL_unify_term(err,
-                            PL_FUNCTOR, FUNCTOR_error2,
-                            PL_FUNCTOR, FUNCTOR_uri_error3,
-                            PL_INT, state.errorCode,
-                            PL_CHARS, s,
-                            PL_LONG, (long)(state.errorPos-s),
-                            PL_VARIABLE);
-    } else {
-      errOk = PL_unify_term(err,
-                            PL_FUNCTOR, FUNCTOR_error2,
-                            PL_FUNCTOR, FUNCTOR_uri_error2,
-                            PL_INT, state.errorCode,
-                            PL_CHARS, s,
-                            PL_VARIABLE);
-    }
-  }
-  return err && errOk && PL_raise_exception(err);
 }
 
-// resolve_uri_(+Base:atom, +Rel:atom, -Abs:atom) is det.
-PREDICATE(resolve_uri_, 3) {
+// resolve_uri_(+Base:atom, +Relative:atom, -Absolute:atom) is det.
+PREDICATE(resolve_uri_, 3)
+{
   char* baseStr;
-  char* relStr;
-  size_t baseLen, relLen;
-  if (!PL_get_nchars(A1, &baseLen, &baseStr, CVT_TEXT) ||
-      !PL_get_nchars(A2, &relLen, &relStr, CVT_TEXT)) {
+  char* relativeStr;
+  std::size_t baseLength, relativeLength;
+  if (!PL_get_nchars(A1, &baseLength, &baseStr, CVT_TEXT) ||
+      !PL_get_nchars(A2, &relativeLength, &relativeStr, CVT_TEXT)) {
     PL_fail;
   }
   UriParserStateA state;
@@ -86,31 +65,31 @@ PREDICATE(resolve_uri_, 3) {
     uriFreeUriMembersA(&baseUri);
     PL_fail; // TBD: throw something
   };
-  UriUriA relUri;
-  state.uri = &relUri;
-  if (uriParseUriA(&state, relStr) != URI_SUCCESS) {
+  UriUriA relativeUri;
+  state.uri = &relativeUri;
+  if (uriParseUriA(&state, relativeStr) != URI_SUCCESS) {
     uriFreeUriMembersA(&baseUri);
-    uriFreeUriMembersA(&relUri);
+    uriFreeUriMembersA(&relativeUri);
     PL_fail; // TBD: throw something
   }
-  UriUriA absUri;
-  if (uriAddBaseUriA(&absUri, &relUri, &baseUri) != URI_SUCCESS) {
-    uriFreeUriMembersA(&absUri);
+  UriUriA absoluteUri;
+  if (uriAddBaseUriA(&absoluteUri, &relativeUri, &baseUri) != URI_SUCCESS) {
+    uriFreeUriMembersA(&absoluteUri);
     PL_fail; // TBD: throw something
   }
-  char* absStr;
-  int absLen;
-  if (uriToStringCharsRequiredA(&absUri, &absLen) != URI_SUCCESS) {
+  char* absoluteStr;
+  int absoluteLength;
+  if (uriToStringCharsRequiredA(&absoluteUri, &absoluteLength) != URI_SUCCESS) {
     PL_fail; // TBD: throw something
   }
-  absLen++;
-  absStr = (char*)malloc(absLen * sizeof(char));
-  if (absStr == nullptr) {
+  ++absoluteLength;
+  absoluteStr = (char*)malloc(absoluteLength * sizeof(char));
+  if (!absoluteStr) {
     PL_fail; // TBD: throw something
   }
-  if (uriToStringA(absStr, &absUri, absLen, nullptr) != URI_SUCCESS) {
+  if (uriToStringA(absoluteStr, &absoluteUri, absoluteLength, nullptr) != URI_SUCCESS) {
     PL_fail; // TBD: throw something
   }
-  uriFreeUriMembersA(&absUri);
-  return A3 = absStr;
+  uriFreeUriMembersA(&absoluteUri);
+  return A3 = absoluteStr;
 }

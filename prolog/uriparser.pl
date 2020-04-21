@@ -16,7 +16,7 @@
 
 */
 
-:- use_foreign_library(foreign(uri_parse)).
+:- use_foreign_library(foreign(uriparser)).
 
 
 

@@ -14,10 +14,10 @@ apt install liburiparser-dev
 
 ## Installation
 
-Perform the following call in [SWI-Prolog](http://www.swi-prolog.org):
+Run the following in [SWI-Prolog](http://www.swi-prolog.org):
 
 ```pl
-pack_install(uriparser).
+pack_install(prolog_uriparser).
 ```
 
 ## Use

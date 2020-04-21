@@ -4,7 +4,7 @@ CXXFLAGS+=-g -std=c++17 -Wall -Wextra
 LD=g++
 LIB=-luriparser
 OBJ=$(SRC:.cpp=.o)
-SOBJ=$(PACKSODIR)/uri_parse.$(SOEXT)
+SOBJ=$(PACKSODIR)/uriparser.$(SOEXT)
 SRC=$(wildcard cpp/*.cpp)
 
 .PHONY: check clean distclean install

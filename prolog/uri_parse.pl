@@ -11,10 +11,8 @@
 ).
 :- reexport(library(uri)).
 
-/** <module> URI parsing
+/** <module> Prolog uriparser binding
 
-@author Wouter Beek
-@versioin 2018-2019
 */
 
 :- use_module(library(uri_ext)).

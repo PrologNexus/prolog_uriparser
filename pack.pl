@@ -5,4 +5,4 @@ maintainer('Wouter Beek', 'wouter@triply.cc').
 name(prolog_uriparser).
 packager('Wouter Beek', 'wouter@triply.cc').
 title('Prolog uriparser').
-version('1.0.1').
+version('1.0.2').

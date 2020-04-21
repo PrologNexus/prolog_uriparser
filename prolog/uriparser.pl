@@ -1,5 +1,5 @@
 :- module(
-  uri_parse,
+  uriparser,
   [
     check_iri/1,   % +Iri
     check_uri/1,   % +Uri
@@ -14,8 +14,6 @@
 /** <module> Prolog uriparser binding
 
 */
-
-:- use_module(library(uri_ext)).
 
 :- use_foreign_library(foreign(uri_parse)).
 

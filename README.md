@@ -1,6 +1,7 @@
 # Prolog uriparser
 
-Prolog bindings for the [uriparser]() library.
+Prolog bindings for the [uriparser](https://uriparser.github.io/)
+library.
 
 ## Prerequisites
 

@@ -9,8 +9,6 @@ SRC=$(wildcard cpp/*.cpp)
 
 .PHONY: check clean distclean install
 
-all:	$(SOBJ)
-
 $(SOBJ): $(OBJ)
 	mkdir -p $(PACKSODIR)
 	$(LD) $(ARCH) $(LDSOFLAGS) -o $@ $^ $(LIB) $(SWISOLIB)
@@ -18,9 +16,15 @@ $(SOBJ): $(OBJ)
 cpp/%.o: cpp/%.cpp
 	$(CXX) $(ARCH) $(CFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-clean:
-distclean:
-	$(RM) $(SOBJ) $(OBJ)
+all: $(SOBJ)
 
 check::
+	$(SWIPL) -s test/test_uriparser.pl -g run_tests -t halt
+
+clean:
+	$(RM) $(OBJ)
+
+distclean:
+	$(RM) $(OBJ) $(SOBJ)
+
 install::

@@ -3,10 +3,11 @@
 Prolog bindings for the [uriparser](https://uriparser.github.io/)
 library.
 
-## Prerequisites
+## Dependencies
 
-The uriparser library must be installed instance-wide prior to
-installing this package:
+  1. Install [SWI-Prolog](https://www.swi-prolog.org).
+
+  2. Install the uriparser library:
 
 ```sh
 apt install liburiparser-dev
@@ -14,10 +15,10 @@ apt install liburiparser-dev
 
 ## Installation
 
-Run the following in [SWI-Prolog](https://www.swi-prolog.org):
+Install this library:
 
 ```pl
-pack_install(prolog_uriparser).
+swipl -g 'pack_install(prolog_uriparser)' -t halt
 ```
 
 ## Use

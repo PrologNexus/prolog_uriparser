@@ -1,6 +1,6 @@
 # -*- Makefile
 
-CXXFLAGS+=-g -std=c++17 -Wall -Wextra
+CXXFLAGS+=-g -std=c++20 -Wall -Wextra
 LD=g++
 LIB=-luriparser
 OBJ=$(SRC:.cpp=.o)

@@ -30,16 +30,16 @@ extern "C" {
 // is_uri_(@Term) is semidet.
 PREDICATE(is_uri_, 1)
 {
-  char* s;
-  std::size_t length;
+  char* s = nullptr;
+  std::size_t length{0};
   if (!PL_get_nchars(A1, &length, &s, CVT_TEXT)) {
     PL_fail;
   }
   UriParserStateA state;
   UriUriA uri;
   state.uri = &uri;
-  const bool ok {uriParseUriA(&state, s) == URI_SUCCESS};
-  const bool absolute {uri.scheme.first};
+  const bool ok{uriParseUriA(&state, s) == URI_SUCCESS};
+  const bool absolute{static_cast<bool>(uri.scheme.first)};
   uriFreeUriMembersA(&uri);
   if (ok && absolute) {
     PL_succeed;
@@ -51,9 +51,9 @@ PREDICATE(is_uri_, 1)
 // resolve_uri_(+Base:atom, +Relative:atom, -Absolute:atom) is det.
 PREDICATE(resolve_uri_, 3)
 {
-  char* baseStr;
-  char* relativeStr;
-  std::size_t baseLength, relativeLength;
+  char* baseStr = nullptr;
+  char* relativeStr = nullptr;
+  std::size_t baseLength{0}, relativeLength{0};
   if (!PL_get_nchars(A1, &baseLength, &baseStr, CVT_TEXT) ||
       !PL_get_nchars(A2, &relativeLength, &relativeStr, CVT_TEXT)) {
     PL_fail;
@@ -77,8 +77,8 @@ PREDICATE(resolve_uri_, 3)
     uriFreeUriMembersA(&absoluteUri);
     PL_fail; // TBD: throw something
   }
-  char* absoluteStr;
-  int absoluteLength;
+  char* absoluteStr = nullptr;
+  int absoluteLength{0};
   if (uriToStringCharsRequiredA(&absoluteUri, &absoluteLength) != URI_SUCCESS) {
     PL_fail; // TBD: throw something
   }

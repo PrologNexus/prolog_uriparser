@@ -4,5 +4,5 @@ home('https://github.com/wouterbeek/prolog_uriparser').
 maintainer('Wouter Beek', 'wouter@triply.cc').
 name(prolog_uriparser).
 packager('Wouter Beek', 'wouter@triply.cc').
-title('Prolog uriparser').
-version('1.0.4').
+title('Prolog binding for uriparser').
+version('1.0.5').

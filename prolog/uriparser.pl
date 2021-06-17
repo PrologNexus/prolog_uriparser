@@ -16,6 +16,8 @@
 
 */
 
+:- use_module(library(shlib)).
+
 :- use_foreign_library(foreign(uriparser)).
 
 
